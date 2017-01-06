@@ -61,10 +61,8 @@ namespace ImagePresenter.Server
 
         public void Process()
         {
-            // we can't use a StreamReader for input, because it buffers up extra data on us inside it's
-            // "processed" view of the world, and we want the data raw after the headers
+            // Initialize
             InputStream = new BufferedStream(Socket.GetStream());
-            // we probably shouldn't be using a streamwriter for all output from handlers either
             OutputStream = new StreamWriter(new BufferedStream(Socket.GetStream()));
 
             try
@@ -86,8 +84,8 @@ namespace ImagePresenter.Server
                 WriteFailure();
             }
 
+            // Dispose
             OutputStream.Flush();
-
             Socket.Close();
         }
 
@@ -129,7 +127,7 @@ namespace ImagePresenter.Server
                 var pos = separator + 1;
                 while ((pos < line.Length) && (line[pos] == ' '))
                 {
-                    pos++; // strip any spaces
+                    pos++; // Strip any spaces
                 }
 
                 var value = line.Substring(pos, line.Length - pos);
@@ -142,20 +140,16 @@ namespace ImagePresenter.Server
         {
             Server.HandleGetRequest(this);
         }
-        
+
         public void HandlePostRequest()
         {
-            // this post data processing just reads everything into a memory stream.
-            // this is fine for smallish things, but for large stuff we should really
-            // hand an input stream to the request processor. However, the input stream 
-            // we hand him needs to let him see the "end of the stream" at this content 
-            // length, because otherwise he won't know when he's seen it all! 
             Console.WriteLine("Get post data start");
             var contentLength = 0;
             var ms = new MemoryStream();
             if (HttpHeaders.ContainsKey("Content-Length"))
             {
                 contentLength = Convert.ToInt32(HttpHeaders["Content-Length"]);
+                // Limit the size of a POST requset
                 if (contentLength > MaxPostSize)
                 {
                     throw new Exception(

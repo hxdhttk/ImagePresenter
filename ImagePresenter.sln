@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagePicker", "ImagePicker\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagePresenter.Server", "ImagePresenter.Server\ImagePresenter.Server.csproj", "{085F1474-84EE-402C-ABB4-76F5F4E9AB16}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagePresenter", "ImagePresenter\ImagePresenter.csproj", "{F3D2BB09-B659-4921-A021-0F2CE02015BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{085F1474-84EE-402C-ABB4-76F5F4E9AB16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{085F1474-84EE-402C-ABB4-76F5F4E9AB16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{085F1474-84EE-402C-ABB4-76F5F4E9AB16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3D2BB09-B659-4921-A021-0F2CE02015BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3D2BB09-B659-4921-A021-0F2CE02015BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3D2BB09-B659-4921-A021-0F2CE02015BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3D2BB09-B659-4921-A021-0F2CE02015BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
