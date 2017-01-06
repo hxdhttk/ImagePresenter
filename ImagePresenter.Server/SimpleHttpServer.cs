@@ -32,9 +32,10 @@ namespace ImagePresenter.Server
             Console.WriteLine($"POST request: {p.HttpUrl}");
             var data = inputData.ReadToEnd();
 
+            p.WriteSuccess();
             p.OutputStream.WriteLine("<html><body><h1>test server</h1>");
             p.OutputStream.WriteLine("<a href=/test>return</a><p>");
-            p.OutputStream.WriteLine("postbody: <pre>{0}</pre>", data);
+            p.OutputStream.WriteLine($"postbody: <pre>{data}</pre>");
         }
     }
 }
