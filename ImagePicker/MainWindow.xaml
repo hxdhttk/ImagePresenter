@@ -29,7 +29,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate DataType="local:WallPaperImage">
                     <StackPanel Margin="3,3,3,3">
-                        <Image Width="160" Height="90" Stretch="Uniform" Source="{Binding Path}"></Image>
+                        <Image Width="160" Height="90" Stretch="Uniform" Source="{Binding Thumbnail}"></Image>
                         <TextBlock Width="160" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding FileName}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace ImagePresenter.Server
 {
@@ -12,30 +13,50 @@ namespace ImagePresenter.Server
         public SimpleHttpServer(int port) : base(port)
         {
         }
+        
+        private List<FileInfo> ImageFileInfos
+        {
+            get
+            {
+                return Directory.EnumerateFiles(Program.ServerSettings.ImagePath)
+                    .Select(f => new FileInfo(f))
+                    .Where(fi => fi.Extension == ".jpg" ||
+                                 fi.Extension == ".png" ||
+                                 fi.Extension == ".bmp")
+                    .ToList();
+            }
+        }
 
         public override void HandleGetRequest(HttpProcessor p)
         {
-            Console.WriteLine($"Request: {p.HttpUrl}");
-            p.WriteSuccess();
-            p.OutputStream.WriteLine("<html><body><h1>test server</h1>");
-            p.OutputStream.WriteLine("Current Time: " + DateTime.Now);
-            p.OutputStream.WriteLine($"url : {p.HttpUrl}");
+            var r = new Random();
+            var fi = ImageFileInfos[r.Next(0, ImageFileInfos.Count)];
+            using (var fs = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read))
+            {
+                Console.WriteLine($"Request: {p.HttpUrl}");
+                switch (fi.Extension)
+                {
+                    case ".jpg":
+                        p.WriteSuccess("jpeg");
+                        break;
+                    case ".png":
+                        p.WriteSuccess("png");
+                        break;
+                    case ".bmp":
+                        p.WriteSuccess("bmp");
+                        break;
+                    default:
+                        throw new Exception("Reached unreachable path!");
+                }               
+                byte[] imgBytes = new byte[fs.Length];
+                using (var br = new BinaryReader(fs))
+                {
+                    imgBytes = br.ReadBytes(Convert.ToInt32(fs.Length));
+                    p.OutputStream.Write(imgBytes, 0, imgBytes.Length);
+                }
 
-            p.OutputStream.WriteLine("<form method=post action=/form>");
-            p.OutputStream.WriteLine("<input type=text name=foo value=foovalue>");
-            p.OutputStream.WriteLine("<input type=submit name=bar value=barvalue>");
-            p.OutputStream.WriteLine("</form>");
-        }
-
-        public override void HandlePostRequest(HttpProcessor p, StreamReader inputData)
-        {
-            Console.WriteLine($"POST request: {p.HttpUrl}");
-            var data = inputData.ReadToEnd();
-
-            p.WriteSuccess();
-            p.OutputStream.WriteLine("<html><body><h1>test server</h1>");
-            p.OutputStream.WriteLine("<a href=/test>return</a><p>");
-            p.OutputStream.WriteLine($"postbody: <pre>{data}</pre>");
+                Console.WriteLine($"Image:{fi.Name} Size:{imgBytes.Length}bytes sent.");
+            }
         }
     }
 }

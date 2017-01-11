@@ -39,7 +39,5 @@ namespace ImagePresenter.Server
         }
 
         public abstract void HandleGetRequest(HttpProcessor p);
-
-        public abstract void HandlePostRequest(HttpProcessor p, StreamReader inputData);
     }
 }

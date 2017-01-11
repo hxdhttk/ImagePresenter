@@ -1,16 +1,24 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Newtonsoft.Json;
 using MessageBox = System.Windows.MessageBox;
 using ThreadState = System.Threading.ThreadState;
+using Image = System.Drawing.Image;
 
 namespace ImagePicker
 {
@@ -23,7 +31,11 @@ namespace ImagePicker
         private static readonly string ServerPath = Path.Combine(Directory.GetCurrentDirectory(), "ImagePresenter.Server.exe");
 
         private Thread _startServerThread;
-        private Thread StartServerThread => _startServerThread ?? (_startServerThread = new Thread(StartServer));
+        private Thread StartServerThread
+        {
+            get { return _startServerThread ?? (_startServerThread = new Thread(StartServer) { Name = $"{nameof(StartServerThread)}" }); }
+            set { _startServerThread = value; }
+        }
 
         public static ObservableCollection<WallPaperImage> WallPaperImages { get; set; }
 
@@ -198,7 +210,7 @@ namespace ImagePicker
             }
 
             StartServerThread.Abort();
-            _startServerThread = new Thread(StartServer);
+            StartServerThread = new Thread(StartServer) { Name = $"{nameof(StartServerThread)}" };
             var p = Process.GetProcessesByName("ImagePresenter.Server").SingleOrDefault();
             p?.Kill();
 
@@ -210,7 +222,23 @@ namespace ImagePicker
 
     public class WallPaperImage
     {
+        private const int ThumbnailHeight = 90;
+        private const int ThumbnailWidth = 160;
+
         public string Path { get; set; }
+
+        public ImageSource Thumbnail
+        {
+            get
+            {
+                Image.GetThumbnailImageAbort dummyCallback = () => false;
+                var originalBitmap = new Bitmap(Path);
+                var thumbnail = originalBitmap.Width <= originalBitmap.Height ?
+                    originalBitmap.GetThumbnailImage(originalBitmap.Width * ThumbnailHeight / originalBitmap.Height, ThumbnailHeight, dummyCallback, IntPtr.Zero) :
+                    originalBitmap.GetThumbnailImage(ThumbnailWidth, originalBitmap.Height * ThumbnailWidth / originalBitmap.Width, dummyCallback, IntPtr.Zero);
+                return ChangeBitmapToImageSource((Bitmap)thumbnail);
+            }
+        }
 
         public string FileName
         {
@@ -219,6 +247,27 @@ namespace ImagePicker
                 var fi = new FileInfo(Path);
                 return fi.Name;
             }
+        }
+
+        [DllImport("gdi32.dll", SetLastError = true)]
+        private static extern bool DeleteObject(IntPtr hObject);
+
+        public static ImageSource ChangeBitmapToImageSource(Bitmap bitmap)
+        {
+            var hBitmap = bitmap.GetHbitmap();
+
+            var wpfBitmap = Imaging.CreateBitmapSourceFromHBitmap(
+                hBitmap,
+                IntPtr.Zero,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
+
+            if (!DeleteObject(hBitmap))
+            {
+                throw new Win32Exception();
+            }
+
+            return wpfBitmap;
         }
     }
 

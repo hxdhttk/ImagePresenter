@@ -16,67 +16,33 @@ namespace ImagePresenter.Server
         public SimpleHttpServerBase Server { get; set; }
 
         private Stream InputStream { get; set; }
-        public StreamWriter OutputStream { get; set; }
+        public Stream OutputStream { get; set; }
 
         public string HttpMethod { get; set; }
         public string HttpUrl { get; set; }
         public string HttpProtocolVersionString { get; set; }
-        public Hashtable HttpHeaders;
-        
-        private const int MaxPostSize = 10 * 1024 * 1024; // 10MB
-        private const int BufSize = 4096;
+        public Hashtable HttpHeaders { get; set; }
 
         public HttpProcessor(TcpClient s, SimpleHttpServerBase srv)
         {
             Socket = s;
             Server = srv;
-
             HttpHeaders = new Hashtable();
         }
-
-        private string StreamReadLine(Stream inputStream)
-        {
-            var nextChar = 0;
-            var data = string.Empty;
-            while (true)
-            {
-                nextChar = inputStream.ReadByte();
-                if (nextChar == '\n')
-                {
-                    break;
-                }
-                if (nextChar == '\r')
-                {
-                    continue;
-                }
-                if (nextChar == -1)
-                {
-                    Thread.Sleep(1);
-                    continue;
-                }
-                data += Convert.ToChar(nextChar);
-            }
-            return data;
-        }
-
+        
         public void Process()
         {
             // Initialize
             InputStream = new BufferedStream(Socket.GetStream());
-            OutputStream = new StreamWriter(new BufferedStream(Socket.GetStream()));
+            OutputStream = new BufferedStream(Socket.GetStream());
 
             try
             {
+                Console.WriteLine("--- --- --- ---");
+                Console.WriteLine("Start processing.");
                 ParseRequest();
                 ReadHeaders();
-                if (HttpMethod.Equals("GET"))
-                {
-                    HandleGetRequest();
-                }
-                else if (HttpMethod.Equals("POST"))
-                {
-                    HandlePostRequest();
-                }
+                HandleGetRequest();
             }
             catch (Exception e)
             {
@@ -87,11 +53,17 @@ namespace ImagePresenter.Server
             // Dispose
             OutputStream.Flush();
             Socket.Close();
+
+            Console.WriteLine("Socket closed.");
+            Console.WriteLine("--- --- --- ---");
+            Console.Write(Environment.NewLine);
         }
 
         public void ParseRequest()
         {
-            var request = StreamReadLine(InputStream);
+            Console.WriteLine("--- ParseRequest() ---");
+
+            var request = InputStream.StreamReadLine();
             var tokens = request.Split(' ');
             if (tokens.Length != 3)
             {
@@ -106,14 +78,14 @@ namespace ImagePresenter.Server
 
         public void ReadHeaders()
         {
-            Console.WriteLine("ReadHeaders()");
+            Console.WriteLine("--- ReadHeaders() ---");
 
             var line = string.Empty;
-            while ((line = StreamReadLine(InputStream)) != null)
+            while ((line = InputStream.StreamReadLine()) != null)
             {
                 if (line.Equals(""))
                 {
-                    Console.WriteLine("Got headers");
+                    Console.WriteLine("Got headers.");
                     return;
                 }
 
@@ -138,64 +110,57 @@ namespace ImagePresenter.Server
 
         public void HandleGetRequest()
         {
+            Console.WriteLine("--- HandleGetRequest() ---");
             Server.HandleGetRequest(this);
         }
 
-        public void HandlePostRequest()
+        public void WriteSuccess(string imageExension)
         {
-            Console.WriteLine("Get post data start");
-            var contentLength = 0;
-            var ms = new MemoryStream();
-            if (HttpHeaders.ContainsKey("Content-Length"))
-            {
-                contentLength = Convert.ToInt32(HttpHeaders["Content-Length"]);
-                // Limit the size of a POST requset
-                if (contentLength > MaxPostSize)
-                {
-                    throw new Exception(
-                        $"POST Content-Length({contentLength}) too big for this simple server");
-                }
-                var buf = new byte[BufSize];
-                var toRead = contentLength;
-                while (toRead > 0)
-                {
-                    Console.WriteLine($"Starting Read, to_read={toRead}");
-
-                    var numread = InputStream.Read(buf, 0, Math.Min(BufSize, toRead));
-                    Console.WriteLine($"Read finished, numread={numread}");
-                    if (numread == 0)
-                    {
-                        if (toRead == 0)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            throw new Exception("Client disconnected during post");
-                        }
-                    }
-                    toRead -= numread;
-                    ms.Write(buf, 0, numread);
-                }
-                ms.Seek(0, SeekOrigin.Begin);
-            }
-            Console.WriteLine("Get post data end");
-            Server.HandlePostRequest(this, new StreamReader(ms));
-        }
-
-        public void WriteSuccess()
-        {
-            OutputStream.WriteLine("HTTP/1.0 200 OK");
-            OutputStream.WriteLine("Content-Type: text/html");
-            OutputStream.WriteLine("Connection: close");
-            OutputStream.WriteLine("");
+            OutputStream.StreamWriteLine("HTTP/1.0 200 OK");
+            OutputStream.StreamWriteLine($"Content-Type: image/{imageExension}");
+            OutputStream.StreamWriteLine("Connection: close");
+            OutputStream.StreamWriteLine("");
         }
 
         public void WriteFailure()
         {
-            OutputStream.WriteLine("HTTP/1.0 404 File not found");
-            OutputStream.WriteLine("Connection: close");
-            OutputStream.WriteLine("");
+            OutputStream.StreamWriteLine("HTTP/1.0 404 File not found");
+            OutputStream.StreamWriteLine("Connection: close");
+            OutputStream.StreamWriteLine("");
+        }
+    }
+
+    public static class StreamExtensions
+    {
+        public static string StreamReadLine(this Stream inputStream)
+        {
+            var data = string.Empty;
+            while (true)
+            {
+                var nextChar = inputStream.ReadByte();
+                if (nextChar == '\n')
+                {
+                    break;
+                }
+                if (nextChar == '\r')
+                {
+                    continue;
+                }
+                if (nextChar == -1)
+                {
+                    Thread.Sleep(1);
+                    continue;
+                }
+                data += Convert.ToChar(nextChar);
+            }
+            return data;
+        }
+
+        public static void StreamWriteLine(this Stream outputStream, string output)
+        {
+            output = output + "\n";
+            var bytes = Encoding.UTF8.GetBytes(output);
+            outputStream.Write(bytes, 0, bytes.Length);
         }
     }
 }

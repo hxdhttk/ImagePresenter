@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagePicker", "ImagePicker\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagePresenter.Server", "ImagePresenter.Server\ImagePresenter.Server.csproj", "{085F1474-84EE-402C-ABB4-76F5F4E9AB16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagePresenter", "ImagePresenter\ImagePresenter.csproj", "{19E5379D-EAFD-4599-8B8E-C942356F57D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagePresenter", "ImagePresenter\ImagePresenter.csproj", "{96F4D26C-C88C-4F45-8D63-492B3F2FCD49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{085F1474-84EE-402C-ABB4-76F5F4E9AB16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{085F1474-84EE-402C-ABB4-76F5F4E9AB16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{085F1474-84EE-402C-ABB4-76F5F4E9AB16}.Release|Any CPU.Build.0 = Release|Any CPU
-		{19E5379D-EAFD-4599-8B8E-C942356F57D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19E5379D-EAFD-4599-8B8E-C942356F57D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{19E5379D-EAFD-4599-8B8E-C942356F57D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{19E5379D-EAFD-4599-8B8E-C942356F57D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96F4D26C-C88C-4F45-8D63-492B3F2FCD49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96F4D26C-C88C-4F45-8D63-492B3F2FCD49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96F4D26C-C88C-4F45-8D63-492B3F2FCD49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96F4D26C-C88C-4F45-8D63-492B3F2FCD49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
