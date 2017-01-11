@@ -1,9 +1,10 @@
 {
-    "output": "Bridge/www"
-    
-    // Uncomment to add TypeScript Definition file (.d.ts) generation to your project.
-    // , "generateTypeScript": true
+  "output": "../ImagePicker/bin/Debug/www",
+  //"output": "../ImagePicker/bin/Release/www"
 
-    // More options available at: 
-    // http://bridge.net/docs/global-configuration
+  // Uncomment to add TypeScript Definition file (.d.ts) generation to your project.
+  // , "generateTypeScript": true
+
+  // More options available at:
+  // http://bridge.net/docs/global-configuration
 }

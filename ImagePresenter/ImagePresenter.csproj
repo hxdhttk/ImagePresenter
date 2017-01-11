@@ -40,11 +40,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Bridge\www\index.html" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Bridge\bridge.json" />
     <None Include="packages.config" />
+	 <None Include="..\ImagePicker\bin\Debug\www\index.html" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Bridge, Version=15.6.0.0, Culture=neutral, processorArchitecture=MSIL">
