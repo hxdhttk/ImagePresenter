@@ -227,16 +227,28 @@ namespace ImagePicker
 
         public string Path { get; set; }
 
+        private ImageSource _thumbnail;
         public ImageSource Thumbnail
         {
             get
             {
-                Image.GetThumbnailImageAbort dummyCallback = () => false;
-                var originalBitmap = new Bitmap(Path);
-                var thumbnail = originalBitmap.Width <= originalBitmap.Height ?
-                    originalBitmap.GetThumbnailImage(originalBitmap.Width * ThumbnailHeight / originalBitmap.Height, ThumbnailHeight, dummyCallback, IntPtr.Zero) :
-                    originalBitmap.GetThumbnailImage(ThumbnailWidth, originalBitmap.Height * ThumbnailWidth / originalBitmap.Width, dummyCallback, IntPtr.Zero);
-                return ChangeBitmapToImageSource((Bitmap)thumbnail);
+                GetThumnnail();
+                return _thumbnail;
+            }
+        }
+
+        private void GetThumnnail()
+        {
+            Image.GetThumbnailImageAbort dummyCallback = () => false;
+            using (var originalBitmap = new Bitmap(Path))
+            {
+                var thumbnail = originalBitmap.Width <= originalBitmap.Height
+                    ? originalBitmap.GetThumbnailImage(
+                        originalBitmap.Width * ThumbnailHeight / originalBitmap.Height, ThumbnailHeight,
+                        dummyCallback, IntPtr.Zero)
+                    : originalBitmap.GetThumbnailImage(ThumbnailWidth,
+                        originalBitmap.Height * ThumbnailWidth / originalBitmap.Width, dummyCallback, IntPtr.Zero);
+                _thumbnail = ChangeBitmapToImageSource((Bitmap)thumbnail);
             }
         }
 
